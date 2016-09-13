@@ -1,0 +1,22 @@
+{
+  "name": "something",
+  "version": "1.0.0",
+  "description": "Odds and ends",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cupools/something.git"
+  },
+  "author": "liyh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cupools/something/issues"
+  },
+  "homepage": "https://github.com/cupools/something#readme"
+}
