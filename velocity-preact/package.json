@@ -1,14 +1,14 @@
 {
   "name": "slider",
   "version": "0.0.1",
-  "description": "Slider for preact",
+  "description": "velocity for preact, inspired by volocity-react",
   "main": "index.js",
   "scripts": {
     "dev": "rm -rf lib && node node_modules/babel-cli/bin/babel src -d lib -D -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "slider",
+    "velocity",
     "preact"
   ],
   "author": "liyh <cupools@gmail.com>",
@@ -28,6 +28,8 @@
     "eslint-plugin-import": "^2.2.0"
   },
   "dependencies": {
-    "preact": "^7.2.0"
+    "lodash": "^4.17.4",
+    "preact": "^7.2.0",
+    "velocity-animate": "^1.4.2"
   }
 }
