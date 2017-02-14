@@ -72,11 +72,16 @@ var Slider = function (_Component) {
       var props = this.props;
 
       var offsetY = this.startY - this.endY;
+      var offsetX = this.startX - this.endX;
 
       if (props.onB2T && offsetY > this.threshold) {
         props.onB2T();
-      } else if (props.onT2B && this.threshold < 0 - this.threshold) {
+      } else if (props.onT2B && offsetY < 0 - this.threshold) {
         props.onT2B();
+      } else if (props.onL2R && offsetX > this.threshold) {
+        props.onL2R();
+      } else if (props.onR2L && offsetX < 0 - this.threshold) {
+        props.onR2L();
       }
     }
   }, {
