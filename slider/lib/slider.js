@@ -24,11 +24,9 @@ var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _preact = require('preact');
 
-var _preact = 'preact',
-    h = _preact.h,
-    Component = _preact.Component;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Slider = function (_Component) {
   (0, _inherits3.default)(Slider, _Component);
@@ -95,7 +93,7 @@ var Slider = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      return h(
+      return (0, _preact.h)(
         'div',
         {
           className: this.props.className,
@@ -107,6 +105,6 @@ var Slider = function (_Component) {
     }
   }]);
   return Slider;
-}(Component);
+}(_preact.Component);
 
 exports.default = Slider;
