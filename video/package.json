@@ -1,0 +1,39 @@
+{
+  "name": "video",
+  "version": "0.0.1",
+  "description": "canvas as video player for mobile device",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=develop node build/server.js",
+    "build": "cross-env NODE_ENV=production webpack --config build/webpack.prod.js"
+  },
+  "keywords": [
+    "video",
+    "canvas"
+  ],
+  "author": "liyh <cupools@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.3.2",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-2": "^6.18.0",
+    "babel-runtime": "^6.20.0",
+    "cross-env": "^3.1.4",
+    "ip": "^1.1.4",
+    "lodash": "^4.17.4",
+    "vconsole": "^2.5.2",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1",
+    "webpack-merge": "^3.0.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^2.0.2"
+  },
+  "directories": {
+    "example": "examples"
+  }
+}
