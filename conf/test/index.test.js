@@ -1,8 +1,8 @@
 /* eslint-env mocha */
-import Chai from 'chai'
+import Chai, { expect } from 'chai'
 import Conf from '../src/index'
 
-Chai.should()
+const should = Chai.should()
 
 describe('index', () => {
   it('should work', () => {
@@ -12,23 +12,28 @@ describe('index', () => {
     const os = () => mockOS
     const pf = () => mockPF
     const raw = {
-      rule: '#root',
+      rule: 'root',
       value: null,
-      childrens: [{
-        rule: '#os.iOS',
+      children: [{
+        rule: 'os',
+        expected: 'iOS',
         value: 'os=ios',
-        childrens: [{
-          rule: '#pf.UCBrowser',
+        children: [{
+          rule: 'pf',
+          expected: 'UCBrowser',
           value: 'os=ios&pf=ucbrowser',
-          childrens: null
+          children: null
         }, {
-          rule: '#pf.WeChat',
+          rule: 'pf',
+          expected: 'WeChat',
           value: 'os=ios&pf=wechat',
-          childrens: null
+          children: null
         }]
       }, {
-        rule: '#os.Android',
-        value: 'os=android'
+        rule: 'os',
+        expected: 'Android',
+        value: 'os=android',
+        children: null
       }]
     }
     const conf = new Conf({ os, pf })
@@ -51,6 +56,6 @@ describe('index', () => {
 
     mockOS = 'Others'
     mockPF = 'UCBrowser'
-    conf.match(raw).should.be.equal(null)
+    should.equal(conf.match(raw), null)
   })
 })

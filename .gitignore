@@ -6,3 +6,4 @@ test/coverage
 /.vscode
 /.extra
 /.nyc_output
+coverage
