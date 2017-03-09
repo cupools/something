@@ -6,10 +6,13 @@ import loader from '../src/loader'
 describe('loader', () => {
   it('should work', () => {
     loader`
-      - os iOS: os=ios
-        - pf UCBrowser: os=ios&pf=ucbrowser
-        - pf WeChat: os=ios&pf=wechat
-      - os Android: os=android
+      _os:
+        iOS:
+          $: os=ios
+          _pf:
+            UCBrowser: os=ios&browser=ucbrowser
+            WeChat: os=ios&browser=wechat
+        Android: os=android
     `.should.eql({
       rule: 'root',
       value: null,
