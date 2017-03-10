@@ -3,7 +3,7 @@
 import Chai from 'chai'
 import loader from '../src/loader'
 
-describe('loader', () => {
+describe.only('loader', () => {
   it('should work', () => {
     loader`
       _os:
