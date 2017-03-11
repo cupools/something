@@ -6,25 +6,29 @@ const TYPE_DEFAULT = 'DEFAULT_VALUE'
 const TYPE_EXPECTED = 'VALUE'
 
 export default function loader(str) {
-  const raw = { _root: yaml.safeLoad(str) }
+  const raw = yaml.safeLoad(str)
   return parseNode(raw)
 }
 
-function parseNode(node, parent) {
-  return _.reduce(node, (mem, val, key) => {
-    const type = nodeType(key)
-    const hasChild = typeof val !== 'string'
-
-    if (type === TYPE_RULE) {
-      const newNode = { rule: key.slice(1) }
-      if (hasChild) {
-        Object.assign(newNode, parseNode(val, newNode))
-      }
-      return newNode
-    } else if (type === TYPE_DEFAULT) {
-      return Object.assign(parent, { value: val })
-    }
-  }, {})
+function parseNode(node) {
+  return _.reduce(node, (ret, props, rule) => ret.concat(
+      _.reduce(props, (mem, value, expected) => {
+        if (typeof value === 'object') {
+          return mem.concat({
+            rule,
+            expected,
+            value: props.$ || null,
+            children: parseNode(value)
+          })
+        }
+        return mem.concat({
+          rule,
+          expected,
+          value,
+          children: null
+        })
+      }, [])
+    ), [])
 }
 
 function nodeType(rule) {
