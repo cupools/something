@@ -10,8 +10,8 @@ describe.only('loader', () => {
         iOS:
           $: os=ios
           _pf:
-            UCBrowser: os=ios&browser=ucbrowser
-            WeChat: os=ios&browser=wechat
+            UCBrowser: os=ios&pf=ucbrowser
+            WeChat: os=ios&pf=wechat
         Android: os=android
     `.should.eql({
       rule: 'root',

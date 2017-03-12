@@ -1,41 +1,33 @@
 import yaml from 'js-yaml'
 import _ from 'lodash'
 
-const TYPE_RULE = 'RULE'
-const TYPE_DEFAULT = 'DEFAULT_VALUE'
-const TYPE_EXPECTED = 'VALUE'
-
 export default function loader(str) {
   const raw = yaml.safeLoad(str)
-  return parseNode(raw)
+  return { rule: 'root', value: null, children: parseNode(raw) }
 }
 
 function parseNode(node) {
-  return _.reduce(node, (ret, props, rule) => ret.concat(
+  // iterate rule node
+  return _.reduce(node, (ret, props, rule) => {
+    // ignore `$` as it just set default value
+    if (rule === '$') {
+      return ret
+    }
+
+    return ret.concat(
+      // iterate props node, create children list
       _.reduce(props, (mem, value, expected) => {
+        // remove rule‘s stamp `_`
+        const n = { rule: rule.replace(/^_*/, ''), expected, value, children: null }
+        // contain sub rules
         if (typeof value === 'object') {
-          return mem.concat({
-            rule,
-            expected,
-            value: props.$ || null,
+          Object.assign(n, {
+            value: value.$ || null,
             children: parseNode(value)
           })
         }
-        return mem.concat({
-          rule,
-          expected,
-          value,
-          children: null
-        })
+        return mem.concat(n)
       }, [])
-    ), [])
-}
-
-function nodeType(rule) {
-  if (rule.indexOf('_') === 0) {
-    return TYPE_RULE
-  } else if (rule === '$') {
-    return TYPE_DEFAULT
-  }
-  return TYPE_EXPECTED
+    )
+  }, [])
 }
