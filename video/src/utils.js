@@ -1,5 +1,4 @@
-export const load(src) {
-
+export const load = (urls, progress) => {
 }
 
 export const loadImage = (urls, progress) => {
@@ -21,12 +20,12 @@ function loadOneImage(src) {
   const img = document.createElement('img')
   return new Promise((resolve, reject) => {
     img.onload = resolve.bind(null, src)
-    img.onerror = err => reject.bind(null, err)
+    img.onerror = reject
     img.src = src
   })
 }
 
-export const loadVideo = (url, progress) => {
+export const loadMedia = (src, progress) => {
   const URL = window.webkitURL || window.URL
   if (!URL) return Promise.resolve(src)
 
@@ -43,10 +42,8 @@ export const loadVideo = (url, progress) => {
           resolve(objectURL)
         }
       }
-      xhr.onprogress = () => progress()
-      xhr.onerror = () => {
-        resolve(src)
-      }
+      xhr.onprogress = e => e.lengthComputable && progress(Math.floor(e.loaded / e.total))
+      xhr.onerror = () => resolve(src)
       xhr.send(null)
     })
     .catch(() => {
