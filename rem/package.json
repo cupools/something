@@ -1,0 +1,52 @@
+{
+  "name": "rem",
+  "version": "0.0.1",
+  "description": "rem unit for flexible layout",
+  "main": "index.js",
+  "scripts": {
+    "transpile": "webpack --config build/webpack.prod.js",
+    "build": "npm run transpile",
+    "test": "cross-env NODE_ENV=testing node_modules/.bin/nyc --reporter lcov --reporter text --report-dir test/coverage --require babel-core/register node_modules/.bin/mocha test/*.test.js && rm -rf .nyc_output",
+    "coverage": "cat test/coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
+  },
+  "keywords": [],
+  "engine": {
+    "node": ">=4.0.0"
+  },
+  "author": "liyh <cupools@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.4.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-es6-promise": "^1.1.1",
+    "babel-plugin-transform-object-assign": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-runtime": "^6.20.0",
+    "chai": "^3.5.0",
+    "cross-env": "^3.1.4",
+    "es6-promise": "^4.1.0",
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
+    "webpack": "^2.2.1"
+  },
+  "dependencies": {
+    "js-yaml": "^3.8.2",
+    "lodash": "^4.17.4"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cupools/rem.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cupools/rem/issues"
+  },
+  "homepage": "https://github.com/cupools/rem#readme"
+}
