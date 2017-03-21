@@ -8,7 +8,7 @@ module.exports = {
     index: path.resolve('src/index.js')
   },
   output: {
-    filename: 'main.js',
+    filename: 'rem.js',
     path: path.resolve('.'),
     library: pkg.name,
     libraryTarget: 'umd',
