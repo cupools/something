@@ -6,20 +6,21 @@ Chai.should()
 
 describe('rem', () => {
   const documentElement = document.documentElement
+  const assert = (val, done) => {
+    setTimeout(() => {
+      documentElement.style.fontSize.should.equal(val)
+      done()
+    }, 400)
+  }
+
 
   it('should work', (done) => {
     rem(640, 10)
-    setTimeout(() => {
-      documentElement.style.fontSize.should.equal('10px')
-      done()
-    }, 400)
+    assert('10px', done)
   })
 
   it('should work with innerHeight', (done) => {
-    rem(1136, 10, true)
-    setTimeout(() => {
-      documentElement.style.fontSize.should.equal('10px')
-      done()
-    }, 400)
+    rem(1136, 100, true)
+    assert('100px', done)
   })
 })
