@@ -2,7 +2,7 @@
   "name": "rem",
   "version": "0.0.1",
   "description": "rem unit for flexible layout",
-  "main": "index.js",
+  "main": "rem.js",
   "scripts": {
     "transpile": "webpack --config build/webpack.prod.js",
     "build": "npm run transpile",

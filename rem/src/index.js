@@ -1,13 +1,14 @@
+const documentElement = document.documentElement
 const vars = {
   __inited: false,
   base: 640,
   convert: 100,
-  compute: (base, convert) => window.innerWidth / base * convert
+  compute: (base, convert) => documentElement.getBoundingClientRect().width / base * convert
 }
 
 function refresh() {
   const val = vars.compute()
-  document.documentElement.style.fontSize = `${val}px`
+  documentElement.style.fontSize = `${val}px`
   return val
 }
 
@@ -32,7 +33,7 @@ export default function rem(base, convert, compute) {
   if (base) assign(vars, { base })
   if (convert) assign(vars, { convert })
   const expected = compute === true
-    ? (b, c) => window.innerHeight / b * c
+    ? (b, c) => documentElement.getBoundingClientRect().height / b * c
     : (compute || vars.compute)
 
   assign(vars, { compute: expected.bind(null, vars.base, vars.convert) })
