@@ -25,8 +25,8 @@ Then it works.
 
 ```css
 .foo {
-  width: 7.5rem; // => 750px
-  height: 1rem; // => 100px
+  width: 7.5rem; /* 750px */
+  height: 1rem; /* 100px */
   color: #fff;
 }
 ```
