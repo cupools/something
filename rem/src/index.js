@@ -25,17 +25,17 @@ function bindEvent(win) {
  * export method
  * @param {Number} base  value according to psd
  * @param {Number} convert  value that convert px unit
- * @param {Function} compute  function to calculate the final fontSize
+ * @param {Function} computeFn  function to calculate the final fontSize
  */
-export default function rem(base, convert, compute) {
+export default function rem(base, convert, computeFn) {
   const { assign } = Object
+  const compute = computeFn === true
+    ? (b, c) => window.innerHeight / b * c
+    : (computeFn || vars.compute)
+
   if (base) assign(vars, { base })
   if (convert) assign(vars, { convert })
-  const expected = compute === true
-    ? (b, c) => window.innerHeight / b * c
-    : (compute || vars.compute)
-
-  assign(vars, { compute: expected.bind(null, vars.base, vars.convert) })
+  assign(vars, { compute: compute.bind(null, vars.base, vars.convert) })
 
   if (!vars.__inited) {
     bindEvent(window)
