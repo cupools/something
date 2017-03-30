@@ -1,0 +1,39 @@
+{
+  "name": "sw",
+  "version": "0.0.1",
+  "description": "service worker example",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=develop node build/server.js",
+    "babel": "rm -rf ani-loader/lib && node node_modules/babel-cli/bin/babel ani-loader/src -d ani-loader/lib -D -w",
+    "test": "cross-env NODE_ENV=testing node_modules/.bin/nyc --reporter lcov --reporter text --report-dir test/coverage --require babel-core/register node_modules/.bin/mocha test/ani.loader.test.js && rm -rf .nyc_output",
+    "build": "rollup -c build/rollup.config.js"
+  },
+  "keywords": [],
+  "author": "liyh <cupools@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-eslint": "^7.1.1",
+    "chai": "^3.5.0",
+    "cross-env": "^3.1.4",
+    "es6-promise": "^4.0.5",
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
+    "postcss": "^5.2.14",
+    "sinon": "^1.17.7",
+    "stylus": "^0.54.5",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.3.0",
+    "webpack-merge": "^2.6.1"
+  },
+  "dependencies": {},
+  "engine": {
+    "node": ">=4.0.0"
+  }
+}

@@ -1,0 +1,12 @@
+.icon0 {
+  width: 256px;
+  height: 256px;
+  background: url('/images/0.png');
+  background-size: cover;
+}
+.icon1 {
+  width: 256px;
+  height: 256px;
+  background: url('/images/1.png');
+  background-size: cover;
+}
