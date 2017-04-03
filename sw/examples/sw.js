@@ -5,13 +5,13 @@ const LIST = [
   '/examples/images/1.png'
 ]
 
-this.addEventListener('install', event => {
+self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(VERSION).then(cache => cache.addAll(LIST))
   )
 })
 
-this.addEventListener('fetch', event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -23,12 +23,16 @@ this.addEventListener('fetch', event => {
   )
 })
 
-this.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keyList => Promise.all(
       keyList.map(key => (PROTECT.includes(key) ? caches.delete(key) : undefined))
     )
   ))
+})
+
+self.addEventListener('message', event => {
+  console.log('msg from client: %s', event.data)
 })
 
 function fetchExtract(request) {
