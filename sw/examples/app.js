@@ -22,5 +22,9 @@ function register() {
 }
 
 function bindEvent() {
-  document.querySelector('.icon0').addEventListener('click', () => navigator.serviceWorker.controller.postMessage('message'))
+  document.querySelector('.icon0').addEventListener('click', () => {
+    const msgChannel = new MessageChannel()
+    msgChannel.port1.onmessage = event => console.log('client: receive msg from sw "%s"', event.data)
+    navigator.serviceWorker.controller.postMessage('msg from client', [msgChannel.port2])
+  })
 }

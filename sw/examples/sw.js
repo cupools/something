@@ -32,7 +32,8 @@ self.addEventListener('activate', event => {
 })
 
 self.addEventListener('message', event => {
-  console.log('msg from client: %s', event.data)
+  const { ports } = event
+  ports[0].postMessage(`sw: receive msg '${event.data}'`)
 })
 
 function fetchExtract(request) {
