@@ -89,3 +89,37 @@ Currying 与 Partial 的比较：
 - 决定怎么算一个步骤
 - 把问题分解成一个步骤和一个较小的问题
 
+```js
+function myLength(ary) {
+  if (_.isEmpty(ary)) {
+    return 0;
+  }
+  return 1 + myLength(_.rest(ary))
+}
+```
+
+### 相互递归函数 mutual recursion
+
+两个或多个函数相互调用被称为相互递归。
+
+```js
+function evenSteven(n) {
+  if (n === 0)
+    return true;
+  else
+    return oddJohn(Math.abs(n) - 1);
+}
+
+function oddJohn(n) {
+  if (n === 0)
+    return false;
+  else
+    return evenSteven(Math.abs(n) - 1);
+}
+// 相互递归调用来回反弹彼此之间递减某个绝对的值，直到一方或另一方达到0
+evenSteven(4)
+// => true
+oddJohn(11)
+// => true
+```
+
