@@ -1,28 +1,12 @@
-const webpack = require('webpack')
-const WebpackDevServer = require('webpack-dev-server')
-const child = require('child_process')
-const config = require('./webpack.config.js')
+const path = require('path')
+const express = require('express')
+const open = require('open')
+const serveStatic = require('serve-static')
 
-new WebpackDevServer(webpack(config), {
-  publicPath: config.output.publicPath,
-  hot: true,
-  historyApiFallback: true,
-  stats: {
-    colors: true,
-    noInfo: true,
-    quiet: true,
-    chunks: false
-  }
-}).listen(3000, err => {
-  if (err) {
-    log(err)
-  } else {
-    const host = 'http://localhost:3000'
-    log(`Listening at ${host}`)
-    child.exec(`open ${host}/examples/index.html`)
-  }
+const app = express()
+
+app.use(serveStatic(path.resolve('dist')))
+app.listen(5000, e => {
+  if (e) throw e
+  open('http://localhost:5000/')
 })
-
-function log(...args) {
-  console.log(...args) // eslint-disable-line no-console
-}

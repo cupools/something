@@ -1,3 +1,5 @@
+import './style.css'
+
 initApp()
 
 function initApp() {
@@ -8,8 +10,8 @@ function initApp() {
 function register() {
   if ('serviceWorker' in navigator) {
     return navigator.serviceWorker.register(
-      '/examples/sw.js',
-      { scope: '/examples/' }
+      '/sw.js',
+      { scope: '/' }
     ).then((reg) => {
       // registration worked
       console.log(`Registration succeeded. Scope is ${reg.scope}`)
