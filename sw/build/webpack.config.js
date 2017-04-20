@@ -49,6 +49,7 @@ module.exports = {
       cacheId: 'sw-demo',
       filename: 'sw.js',
       maximumFileSizeToCacheInBytes: 1024 * 1024,
+      staticFileGlobsIgnorePatterns: [/\.html$/],
       minify: false,
       runtimeCaching: [{
         handler: 'cacheFirst',

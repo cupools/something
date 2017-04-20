@@ -31,6 +31,10 @@ self.addEventListener('activate', event => {
   ))
 })
 
+self.addEventListener('push', event => {
+  console.log(event.data.text())
+})
+
 self.addEventListener('message', event => {
   const { ports } = event
   ports[0].postMessage(`sw: receive msg '${event.data}'`)
