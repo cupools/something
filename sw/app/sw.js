@@ -32,7 +32,11 @@ self.addEventListener('activate', event => {
 })
 
 self.addEventListener('push', event => {
-  console.log(event.data.text())
+  event.waitUntil(
+    self.self.registration.showNotification('push comming', {
+      body: 'Message from push'
+    })
+  )
 })
 
 self.addEventListener('message', event => {

@@ -3,6 +3,7 @@ import './style.css'
 initApp()
 
 function initApp() {
+  subscribe()
   register()
   bindEvent()
 }
@@ -21,6 +22,27 @@ function register() {
     })
   }
   return null
+}
+
+function subscribe() {
+  if (!navigator.serviceWorker) {
+    return
+  }
+
+  navigator.serviceWorker.ready
+    .then(reg => reg.pushManager.getSubscription()
+    .then(subscription => {
+      if (subscription) {
+        return Promise.resolve(subscription)
+      }
+      return reg.pushManager.subscribe({ userVisibleOnly: true })
+    })
+    .then(pushSubscription => {
+      console.log('remain endpoint key: ', pushSubscription.endpoint)
+    })
+    .catch((err) => {
+      console.warn('Error during getSubscription()', err)
+    }))
 }
 
 function bindEvent() {

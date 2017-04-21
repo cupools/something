@@ -8,3 +8,4 @@ test/coverage
 /.nyc_output
 coverage
 /sw/dist
+/sw/curl.sh
