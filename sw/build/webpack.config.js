@@ -1,8 +1,7 @@
 const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
-
+const SWPrecacheWebpackPlugin = require('../lib/plugin').default
 
 module.exports = {
   entry: {
@@ -48,13 +47,9 @@ module.exports = {
     new SWPrecacheWebpackPlugin({
       cacheId: 'sw-demo',
       filename: 'sw.js',
-      maximumFileSizeToCacheInBytes: 1024 * 1024,
+      filepath: 'build/sw.js',
       staticFileGlobsIgnorePatterns: [/\.html$/],
-      minify: false,
-      runtimeCaching: [{
-        handler: 'cacheFirst',
-        urlPattern: /[.]mp3$/
-      }]
+      minify: false
     })
   ]
 }

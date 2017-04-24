@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=develop node build/server.js",
-    "babel": "rm -rf ani-loader/lib && node node_modules/babel-cli/bin/babel ani-loader/src -d ani-loader/lib -D -w",
+    "babel": "rm -rf lib && node node_modules/babel-cli/bin/babel src -d lib -D -w",
     "test": "cross-env NODE_ENV=testing node_modules/.bin/nyc --reporter lcov --reporter text --report-dir test/coverage --require babel-core/register node_modules/.bin/mocha test/ani.loader.test.js && rm -rf .nyc_output",
     "build": "webpack --config build/webpack.config.js --progress --display-error-details && cp app/manifest.json dist/",
     "push": "sh curl.sh"
@@ -19,6 +19,8 @@
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.4.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "chai": "^3.5.0",
     "cross-env": "^3.1.4",
     "css-loader": "^0.28.0",
