@@ -1,17 +1,38 @@
 const fs = require('fs')
 const path = require('path')
-const SWPrecache = require('sw-precache-webpack-plugin')
 
-export default class Precache extends SWPrecache {
+const DEFAULT_OPTIONS = {
+  cacheName: 'xxx',
+  filename: '',
+  filepath: '',
+  scope: '',
+  fileIgnorePatterns: [],
+  fileGlobsPatterns: []
+}
+
+export default class Precache {
+  constructor(opts) {
+    this.options = Object.assign({}, DEFAULT_OPTIONS, opts)
+  }
+
   apply(compiler) {
-    super.apply(compiler)
-
     compiler.plugin('after-emit', (compilation, callback) => {
       const done = () => callback()
       const error = err => callback(err)
-      this.writeExtendFiles(compiler)
-        .then(done, error)
+
+      const assets = this.getAssets()
     })
+  }
+
+  getAssets(compilation) {
+    const { fileIgnorePatterns, fileGlobsPatterns } = this.options
+    return Object.keys(compilation)
+      .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
+      .filter(url => fileGlobsPatterns.every(p => p.test(url)))
+  }
+
+  renderTemplate() {
+
   }
 
   writeExtendFiles(compiler) {
