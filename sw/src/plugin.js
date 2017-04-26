@@ -20,7 +20,7 @@ export default class Precache {
       const done = () => callback()
       const error = err => callback(err)
 
-      const assets = this.getAssets()
+      const assets = this.getAssets(compilation)
     })
   }
 
