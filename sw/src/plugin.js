@@ -1,13 +1,17 @@
 const fs = require('fs')
 const path = require('path')
+const template = require('lodash.template')
 
 const DEFAULT_OPTIONS = {
   cacheName: 'xxx',
-  filename: '',
-  filepath: '',
+  output: '',
   scope: '',
   fileIgnorePatterns: [],
-  fileGlobsPatterns: []
+  fileGlobsPatterns: [],
+  templates: {
+    'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
+    'sw.js': path.join(__dirname, '../dist/sw.js')
+  }
 }
 
 export default class Precache {
@@ -21,6 +25,29 @@ export default class Precache {
       const error = err => callback(err)
 
       const assets = this.getAssets(compilation)
+      const options = {
+        assets
+      }
+
+      const { output } = options
+      const { outputFileSystem } = compilation
+
+      this.render(options)
+        .then(files => new Promise(resolve => {
+          outputFileSystem.mkdirp(path.resolve(output), resolve.bind(null, files))
+        }))
+        .then(files => {
+          const writeFile = file => {
+            const { filename, content } = file
+            const dist = path.join(output, filename)
+            return new Promise(resolve => {
+              outputFileSystem.writeFile(dist, content, resolve)
+            })
+          }
+          return Promise.all(files.map(writeFile))
+        })
+        .then(done)
+        .catch(error)
     })
   }
 
@@ -31,23 +58,13 @@ export default class Precache {
       .filter(url => fileGlobsPatterns.every(p => p.test(url)))
   }
 
-  renderTemplate() {
-
-  }
-
-  writeExtendFiles(compiler) {
-    const { filepath } = this.workerOptions
-    const tmpl = {
-      'manifest.json': path.join(__dirname, './tmpl/manifest.json')
-    }
-
-    return Promise.all(
-      Object.keys(tmpl).map(filename => {
-        const target = tmpl[filename]
-        const content = fs.readFileSync(target, 'utf8')
-        const dist = path.join(filepath, '..', filename)
-        return compiler.outputFileSystem.writeFile(dist, content)
-      })
-    )
+  render(options) {
+    return Object.keys(this.templates)
+      .reduce((mem, filename) => {
+        const filepath = this.templates[filename]
+        const raw = fs.readFileSync(filepath, 'utf-8')
+        const content = template(raw, options)
+        return mem.concat({ filename, content })
+      }, [])
   }
 }
