@@ -17,7 +17,7 @@ self.addEventListener('fetch', event => {
       .then(response => {
         if (response) return response
         // fetch extract resource and cache them
-        return fetchExtract(event.request)
+        return fetchAndCache(event.request)
       })
       .catch(() => fetch(event.request))
   )
@@ -26,7 +26,7 @@ self.addEventListener('fetch', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keyList => Promise.all(
-      keyList.map(key => (PROTECT.includes(key) ? caches.delete(key) : undefined))
+      keyList.map(key => (PROTECT.includes(key) ? caches.delete(key) : Promise.resolve()))
     )
   ))
 })
@@ -44,7 +44,7 @@ self.addEventListener('message', event => {
   ports[0].postMessage(`sw: receive msg '${event.data}'`)
 })
 
-function fetchExtract(request) {
+function fetchAndCache(request) {
   return fetch(request).then(res => {
     const clone = res.clone()
     caches.open(VERSION).then(cache => cache.put(request, clone))

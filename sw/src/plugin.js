@@ -3,13 +3,19 @@ const path = require('path')
 const template = require('lodash.template')
 
 const DEFAULT_OPTIONS = {
-  cacheName: 'xxx',
-  output: '',
-  scope: '',
+  globalOptions: {
+    actName: '',
+    cacheName: '',
+    scope: '',
+    downgrade: false,
+    assets: null
+  },
+  output: 'dist/',
   fileIgnorePatterns: [],
   fileGlobsPatterns: [],
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
+    'assets.json': path.join(__dirname, './tmpl/assets.json'),
     'sw.js': path.join(__dirname, '../dist/sw.js')
   }
 }
@@ -23,14 +29,16 @@ export default class Precache {
     compiler.plugin('after-emit', (compilation, callback) => {
       const done = () => callback()
       const error = err => callback(err)
+      const { globalOptions } = this.options
 
       const assets = this.getAssets(compilation)
       const options = {
-        assets
+        globalOptions,
+        assets: globalOptions.assets || assets
       }
 
       const { output } = options
-      const { outputFileSystem } = compilation
+      const { outputFileSystem } = compiler
 
       this.render(options)
         .then(files => new Promise(resolve => {
@@ -59,12 +67,16 @@ export default class Precache {
   }
 
   render(options) {
-    return Object.keys(this.templates)
+    const { templates } = this.options
+    const ret = Object.keys(templates)
       .reduce((mem, filename) => {
-        const filepath = this.templates[filename]
+        const filepath = templates[filename]
         const raw = fs.readFileSync(filepath, 'utf-8')
-        const content = template(raw, options)
+        const content = template(raw)(options)
+
         return mem.concat({ filename, content })
       }, [])
+
+    return Promise.resolve(ret)
   }
 }

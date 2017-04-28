@@ -6,33 +6,41 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var fs = require('fs');
 var path = require('path');
-var SWPrecache = require('sw-precache-webpack-plugin');
+var template = require('lodash.template');
 
-var Precache = function (_SWPrecache) {
-  _inherits(Precache, _SWPrecache);
+var DEFAULT_OPTIONS = {
+  globalOptions: {
+    actName: '',
+    cacheName: '',
+    scope: '',
+    downgrade: false,
+    assets: null
+  },
+  output: 'dist/',
+  fileIgnorePatterns: [],
+  fileGlobsPatterns: [],
+  templates: {
+    'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
+    'assets.json': path.join(__dirname, './tmpl/assets.json'),
+    'sw.js': path.join(__dirname, '../dist/sw.js')
+  }
+};
 
-  function Precache() {
+var Precache = function () {
+  function Precache(opts) {
     _classCallCheck(this, Precache);
 
-    return _possibleConstructorReturn(this, (Precache.__proto__ || Object.getPrototypeOf(Precache)).apply(this, arguments));
+    this.options = Object.assign({}, DEFAULT_OPTIONS, opts);
   }
 
   _createClass(Precache, [{
     key: 'apply',
     value: function apply(compiler) {
-      var _this2 = this;
-
-      _get(Precache.prototype.__proto__ || Object.getPrototypeOf(Precache.prototype), 'apply', this).call(this, compiler);
+      var _this = this;
 
       compiler.plugin('after-emit', function (compilation, callback) {
         var done = function done() {
@@ -41,28 +49,72 @@ var Precache = function (_SWPrecache) {
         var error = function error(err) {
           return callback(err);
         };
-        _this2.writeExtendFiles(compiler).then(done, error);
+        var globalOptions = _this.options.globalOptions;
+
+
+        var assets = _this.getAssets(compilation);
+        var options = {
+          globalOptions: globalOptions,
+          assets: globalOptions.assets || assets
+        };
+
+        var output = options.output;
+        var outputFileSystem = compiler.outputFileSystem;
+
+
+        _this.render(options).then(function (files) {
+          return new Promise(function (resolve) {
+            outputFileSystem.mkdirp(path.resolve(output), resolve.bind(null, files));
+          });
+        }).then(function (files) {
+          var writeFile = function writeFile(file) {
+            var filename = file.filename,
+                content = file.content;
+
+            var dist = path.join(output, filename);
+            return new Promise(function (resolve) {
+              outputFileSystem.writeFile(dist, content, resolve);
+            });
+          };
+          return Promise.all(files.map(writeFile));
+        }).then(done).catch(error);
       });
     }
   }, {
-    key: 'writeExtendFiles',
-    value: function writeExtendFiles(compiler) {
-      var filepath = this.workerOptions.filepath;
+    key: 'getAssets',
+    value: function getAssets(compilation) {
+      var _options = this.options,
+          fileIgnorePatterns = _options.fileIgnorePatterns,
+          fileGlobsPatterns = _options.fileGlobsPatterns;
 
-      var tmpl = {
-        'manifest.json': path.join(__dirname, './tmpl/manifest.json')
-      };
+      return Object.keys(compilation).filter(function (url) {
+        return !fileIgnorePatterns.some(function (p) {
+          return p.test(url);
+        });
+      }).filter(function (url) {
+        return fileGlobsPatterns.every(function (p) {
+          return p.test(url);
+        });
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render(options) {
+      var templates = this.options.templates;
 
-      return Promise.all(Object.keys(tmpl).map(function (filename) {
-        var target = tmpl[filename];
-        var content = fs.readFileSync(target, 'utf8');
-        var dist = path.join(filepath, '..', filename);
-        return compiler.outputFileSystem.writeFile(dist, content);
-      }));
+      var ret = Object.keys(templates).reduce(function (mem, filename) {
+        var filepath = templates[filename];
+        var raw = fs.readFileSync(filepath, 'utf-8');
+        var content = template(raw)(options);
+
+        return mem.concat({ filename: filename, content: content });
+      }, []);
+
+      return Promise.resolve(ret);
     }
   }]);
 
   return Precache;
-}(SWPrecache);
+}();
 
 exports.default = Precache;
