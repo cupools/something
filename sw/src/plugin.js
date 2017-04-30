@@ -1,6 +1,7 @@
-const fs = require('fs')
-const path = require('path')
-const template = require('lodash.template')
+import fs from 'fs'
+import path from 'path'
+import template from 'lodash.template'
+import helper from './helper'
 
 const DEFAULT_OPTIONS = {
   globalOptions: {
@@ -15,8 +16,7 @@ const DEFAULT_OPTIONS = {
   fileGlobsPatterns: [],
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
-    'assets.json': path.join(__dirname, './tmpl/assets.json'),
-    'sw.js': path.join(__dirname, '../dist/sw.js')
+    'assets.json': path.join(__dirname, './tmpl/assets.json')
   }
 }
 
@@ -31,13 +31,13 @@ export default class Precache {
       const error = err => callback(err)
       const { globalOptions } = this.options
 
-      const assets = this.getAssets(compilation)
+      const assets = this.getAssets(compiler, compilation)
       const options = {
         globalOptions,
         assets: globalOptions.assets || assets
       }
 
-      const { output } = options
+      const { output } = this.options
       const { outputFileSystem } = compiler
 
       this.render(options)
@@ -59,9 +59,12 @@ export default class Precache {
     })
   }
 
-  getAssets(compilation) {
+  getAssets(compiler, compilation) {
+    const { outputPath } = compiler
     const { fileIgnorePatterns, fileGlobsPatterns } = this.options
+
     return Object.keys(compilation)
+      .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
       .filter(url => fileGlobsPatterns.every(p => p.test(url)))
   }
@@ -72,7 +75,7 @@ export default class Precache {
       .reduce((mem, filename) => {
         const filepath = templates[filename]
         const raw = fs.readFileSync(filepath, 'utf-8')
-        const content = template(raw)(options)
+        const content = template(raw)({ options, ...helper })
 
         return mem.concat({ filename, content })
       }, [])

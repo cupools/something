@@ -1,0 +1,3 @@
+{
+  "assets": <%= JSON.stringify(assets) %>
+}
