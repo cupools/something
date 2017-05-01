@@ -1,17 +1,18 @@
 import fs from 'fs'
 import path from 'path'
 import template from 'lodash.template'
-import helper from './helper'
+import omit from 'lodash.omit'
+import templateHelper from './templateHelper'
 
 const DEFAULT_OPTIONS = {
-  globalOptions: {
+  sw: {
     actName: '',
     cacheName: '',
-    scope: '',
+    scope: '/',
     downgrade: false,
     assets: null
   },
-  output: 'dist/',
+  output: '',
   fileIgnorePatterns: [],
   fileGlobsPatterns: [],
   templates: {
@@ -22,25 +23,30 @@ const DEFAULT_OPTIONS = {
 
 export default class Precache {
   constructor(opts) {
-    this.options = Object.assign({}, DEFAULT_OPTIONS, opts)
+    this.__opts = opts
+    this.sw = {}
+    this.options = {}
+  }
+
+  configure(compiler, compilation) {
+    const { sw = {}, ...options } = this.__opts
+    this.options = { ...omit(DEFAULT_OPTIONS, 'sw'), ...options }
+
+    const assets = sw.assets || this.getAssets(compiler, compilation)
+    this.sw = { ...DEFAULT_OPTIONS.sw, ...sw, assets }
   }
 
   apply(compiler) {
     compiler.plugin('after-emit', (compilation, callback) => {
+      this.configure(compiler, compilation)
+
       const done = () => callback()
       const error = err => callback(err)
-      const { globalOptions } = this.options
-
-      const assets = this.getAssets(compiler, compilation)
-      const options = {
-        globalOptions,
-        assets: globalOptions.assets || assets
-      }
 
       const { output } = this.options
       const { outputFileSystem } = compiler
 
-      this.render(options)
+      this.render()
         .then(files => new Promise(resolve => {
           outputFileSystem.mkdirp(path.resolve(output), resolve.bind(null, files))
         }))
@@ -63,19 +69,21 @@ export default class Precache {
     const { outputPath } = compiler
     const { fileIgnorePatterns, fileGlobsPatterns } = this.options
 
-    return Object.keys(compilation)
+    return Object.keys(compilation.assets)
       .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
       .filter(url => fileGlobsPatterns.every(p => p.test(url)))
   }
 
-  render(options) {
+  render() {
     const { templates } = this.options
+    const renderContext = { ...this.sw, ...templateHelper }
+
     const ret = Object.keys(templates)
       .reduce((mem, filename) => {
         const filepath = templates[filename]
         const raw = fs.readFileSync(filepath, 'utf-8')
-        const content = template(raw)({ options, ...helper })
+        const content = template(raw)(renderContext)
 
         return mem.concat({ filename, content })
       }, [])

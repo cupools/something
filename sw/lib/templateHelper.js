@@ -12,6 +12,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = {
   include: function include(p) {
-    return _fs2.default.readFileSync(p, 'utf-8');
+    return _fs2.default.readFileSync(p, 'utf8');
   }
 };

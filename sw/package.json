@@ -41,15 +41,14 @@
     "sinon": "^1.17.7",
     "style-loader": "^0.16.1",
     "stylus": "^0.54.5",
-    "sw-precache": "^5.1.0",
     "url-loader": "^0.5.8",
     "webpack": "^2.3.2",
     "webpack-dev-server": "^2.4.2",
     "webpack-merge": "^2.6.1"
   },
   "dependencies": {
-    "lodash.template": "^4.4.0",
-    "sw-precache-webpack-plugin": "^0.9.1"
+    "lodash.omit": "^4.5.0",
+    "lodash.template": "^4.4.0"
   },
   "engine": {
     "node": ">=4.0.0"

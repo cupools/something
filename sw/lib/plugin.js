@@ -20,23 +20,29 @@ var _lodash = require('lodash.template');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _helper = require('./helper');
+var _lodash3 = require('lodash.omit');
 
-var _helper2 = _interopRequireDefault(_helper);
+var _lodash4 = _interopRequireDefault(_lodash3);
+
+var _templateHelper = require('./templateHelper');
+
+var _templateHelper2 = _interopRequireDefault(_templateHelper);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var DEFAULT_OPTIONS = {
-  globalOptions: {
+  sw: {
     actName: '',
     cacheName: '',
-    scope: '',
+    scope: '/',
     downgrade: false,
     assets: null
   },
-  output: 'dist/',
+  output: '',
   fileIgnorePatterns: [],
   fileGlobsPatterns: [],
   templates: {
@@ -49,35 +55,44 @@ var Precache = function () {
   function Precache(opts) {
     _classCallCheck(this, Precache);
 
-    this.options = Object.assign({}, DEFAULT_OPTIONS, opts);
+    this.__opts = opts;
+    this.sw = {};
+    this.options = {};
   }
 
   _createClass(Precache, [{
+    key: 'configure',
+    value: function configure(compiler, compilation) {
+      var _opts = this.__opts,
+          _opts$sw = _opts.sw,
+          sw = _opts$sw === undefined ? {} : _opts$sw,
+          options = _objectWithoutProperties(_opts, ['sw']);
+
+      this.options = _extends({}, (0, _lodash4.default)(DEFAULT_OPTIONS, 'sw'), options);
+
+      var assets = sw.assets || this.getAssets(compiler, compilation);
+      this.sw = _extends({}, DEFAULT_OPTIONS.sw, sw, { assets: assets });
+    }
+  }, {
     key: 'apply',
     value: function apply(compiler) {
       var _this = this;
 
       compiler.plugin('after-emit', function (compilation, callback) {
+        _this.configure(compiler, compilation);
+
         var done = function done() {
           return callback();
         };
         var error = function error(err) {
           return callback(err);
         };
-        var globalOptions = _this.options.globalOptions;
-
-
-        var assets = _this.getAssets(compiler, compilation);
-        var options = {
-          globalOptions: globalOptions,
-          assets: globalOptions.assets || assets
-        };
 
         var output = _this.options.output;
         var outputFileSystem = compiler.outputFileSystem;
 
 
-        _this.render(options).then(function (files) {
+        _this.render().then(function (files) {
           return new Promise(function (resolve) {
             outputFileSystem.mkdirp(_path2.default.resolve(output), resolve.bind(null, files));
           });
@@ -104,7 +119,7 @@ var Precache = function () {
           fileGlobsPatterns = _options.fileGlobsPatterns;
 
 
-      return Object.keys(compilation).map(function (f) {
+      return Object.keys(compilation.assets).map(function (f) {
         return _path2.default.join(outputPath, f);
       }).filter(function (url) {
         return !fileIgnorePatterns.some(function (p) {
@@ -118,13 +133,15 @@ var Precache = function () {
     }
   }, {
     key: 'render',
-    value: function render(options) {
+    value: function render() {
       var templates = this.options.templates;
+
+      var renderContext = _extends({}, this.sw, _templateHelper2.default);
 
       var ret = Object.keys(templates).reduce(function (mem, filename) {
         var filepath = templates[filename];
         var raw = _fs2.default.readFileSync(filepath, 'utf-8');
-        var content = (0, _lodash2.default)(raw)(_extends({ options: options }, _helper2.default));
+        var content = (0, _lodash2.default)(raw)(renderContext);
 
         return mem.concat({ filename: filename, content: content });
       }, []);

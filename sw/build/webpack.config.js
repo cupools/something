@@ -45,11 +45,16 @@ module.exports = {
       template: 'app/index.html'
     }),
     new SWPrecacheWebpackPlugin({
-      cacheId: 'sw-demo',
-      filename: 'sw.js',
-      filepath: 'build/sw.js',
-      staticFileGlobsIgnorePatterns: [/\.html$/],
-      minify: false
+      sw: {
+        actName: 'swdemo',
+        cacheName: 'version0',
+        scope: '/',
+        downgrade: false,
+        assets: null
+      },
+      output: 'dist/',
+      fileIgnorePatterns: [],
+      fileGlobsPatterns: []
     })
   ]
 }
