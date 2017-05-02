@@ -54,6 +54,7 @@ export default class Precache {
           const writeFile = file => {
             const { filename, content } = file
             const dist = path.join(output, filename)
+
             return new Promise(resolve => {
               outputFileSystem.writeFile(dist, content, resolve)
             })
@@ -67,17 +68,19 @@ export default class Precache {
 
   getAssets(compiler, compilation) {
     const { outputPath } = compiler
+    const { publicPath } = compiler.options.output
     const { fileIgnorePatterns, fileGlobsPatterns } = this.options
 
     return Object.keys(compilation.assets)
       .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
       .filter(url => fileGlobsPatterns.every(p => p.test(url)))
+      .map(f => publicPath + f.replace(outputPath + path.sep, ''))
   }
 
   render() {
     const { templates } = this.options
-    const renderContext = { ...this.sw, ...templateHelper }
+    const renderContext = { options: omit(this.sw, 'assets'), ...this.sw, ...templateHelper }
 
     const ret = Object.keys(templates)
       .reduce((mem, filename) => {

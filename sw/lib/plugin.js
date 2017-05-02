@@ -102,6 +102,7 @@ var Precache = function () {
                 content = file.content;
 
             var dist = _path2.default.join(output, filename);
+
             return new Promise(function (resolve) {
               outputFileSystem.writeFile(dist, content, resolve);
             });
@@ -114,6 +115,7 @@ var Precache = function () {
     key: 'getAssets',
     value: function getAssets(compiler, compilation) {
       var outputPath = compiler.outputPath;
+      var publicPath = compiler.options.output.publicPath;
       var _options = this.options,
           fileIgnorePatterns = _options.fileIgnorePatterns,
           fileGlobsPatterns = _options.fileGlobsPatterns;
@@ -129,6 +131,8 @@ var Precache = function () {
         return fileGlobsPatterns.every(function (p) {
           return p.test(url);
         });
+      }).map(function (f) {
+        return publicPath + f.replace(outputPath + _path2.default.sep, '');
       });
     }
   }, {
@@ -136,7 +140,7 @@ var Precache = function () {
     value: function render() {
       var templates = this.options.templates;
 
-      var renderContext = _extends({}, this.sw, _templateHelper2.default);
+      var renderContext = _extends({ options: (0, _lodash4.default)(this.sw, 'assets') }, this.sw, _templateHelper2.default);
 
       var ret = Object.keys(templates).reduce(function (mem, filename) {
         var filepath = templates[filename];

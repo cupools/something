@@ -8,10 +8,16 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
   include: function include(p) {
-    return _fs2.default.readFileSync(p, 'utf8');
-  }
+    var target = p.indexOf('$') === 0 ? _path2.default.join(__dirname, '..', p.slice(1)) : _path2.default.resolve(p);
+    return _fs2.default.readFileSync(target, 'utf8');
+  },
+  path: _path2.default
 };
