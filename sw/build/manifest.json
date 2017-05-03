@@ -1,8 +1,0 @@
-{
-  "short_name": "PWA DEMO",
-  "name": "WELCOME PWA DEMO",
-  "start_url": "index.html",
-  "icons": "",
-  "gcm_sender_id": "439366287119",
-  "permissions": [ "gcm","storage","pushMessaging","notifications" ]
-}

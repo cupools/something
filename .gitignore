@@ -9,3 +9,4 @@ test/coverage
 coverage
 /sw/dist
 /sw/curl.sh
+/sw/test/tmp

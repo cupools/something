@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=develop node build/server.js",
     "babel": "rm -rf lib && node node_modules/babel-cli/bin/babel src -d lib -D -w",
-    "test": "cross-env NODE_ENV=testing node_modules/.bin/nyc --reporter lcov --reporter text --report-dir test/coverage --require babel-core/register node_modules/.bin/mocha test/ani.loader.test.js && rm -rf .nyc_output",
+    "test": "cross-env NODE_ENV=test node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha --dir test/coverage --root src --include-all-sources true -- --compilers js:babel-core/register -i test/*.test.js",
     "build": "webpack --config build/webpack.config.js --progress --display-error-details",
     "push": "sh curl.sh"
   },
@@ -33,6 +33,7 @@
     "file-loader": "^0.11.1",
     "html-webpack-plugin": "^2.28.0",
     "ip": "^1.1.5",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
     "open": "0.0.5",
