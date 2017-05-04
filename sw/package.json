@@ -49,7 +49,8 @@
   },
   "dependencies": {
     "lodash.omit": "^4.5.0",
-    "lodash.template": "^4.4.0"
+    "lodash.template": "^4.4.0",
+    "minimatch": "^3.0.3"
   },
   "engine": {
     "node": ">=4.0.0"

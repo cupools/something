@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import minimatch from 'minimatch'
 import template from 'lodash.template'
 import omit from 'lodash.omit'
 import templateHelper from './templateHelper'
@@ -14,7 +15,7 @@ const DEFAULT_OPTIONS = {
   },
   output: '',
   fileIgnorePatterns: [],
-  fileGlobsPatterns: [],
+  filePatterns: [],
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
     'assets.json': path.join(__dirname, './tmpl/assets.json')
@@ -69,12 +70,14 @@ export default class Precache {
   getAssets(compiler, compilation) {
     const { outputPath } = compiler
     const { publicPath } = compiler.options.output
-    const { fileIgnorePatterns, fileGlobsPatterns } = this.options
+    const { fileIgnorePatterns, filePatterns } = this.options
 
     return Object.keys(compilation.assets)
       .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
-      .filter(url => fileGlobsPatterns.every(p => p.test(url)))
+      .filter(url => filePatterns.every(
+        p => (p.length ? minimatch(url, p) : p.test(url))
+      ))
       .map(f => publicPath + f.replace(outputPath + path.sep, ''))
   }
 

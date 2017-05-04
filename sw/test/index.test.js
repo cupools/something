@@ -32,8 +32,8 @@ describe('plugin', () => {
             assets: null
           },
           output: path.join(__dirname, './tmp/sw/'),
-          fileIgnorePatterns: [],
-          fileGlobsPatterns: []
+          fileIgnorePatterns: [/html/],
+          filePatterns: ['**/*.@(html|css)']
         })
       ]
     })
