@@ -19,7 +19,11 @@ const DEFAULT_OPTIONS = {
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
     'assets.json': path.join(__dirname, './tmpl/assets.json')
-  }
+  },
+  urlPatterns: [{
+    test: '^https?:\\/\\/cdnjs\\.cloudflare\\.com',
+    handler: 'cacheFirst'
+  }]
 }
 
 export default class Precache {
@@ -71,13 +75,12 @@ export default class Precache {
     const { outputPath } = compiler
     const { publicPath } = compiler.options.output
     const { fileIgnorePatterns, filePatterns } = this.options
+    const matchPattern = (p, url) => (p.length ? minimatch(url, p) : p.test(url))
 
     return Object.keys(compilation.assets)
       .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
-      .filter(url => filePatterns.every(
-        p => (p.length ? minimatch(url, p) : p.test(url))
-      ))
+      .filter(url => filePatterns.every(p => matchPattern(p, url)))
       .map(f => publicPath + f.replace(outputPath + path.sep, ''))
   }
 

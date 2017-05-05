@@ -16,6 +16,10 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
+var _minimatch = require('minimatch');
+
+var _minimatch2 = _interopRequireDefault(_minimatch);
+
 var _lodash = require('lodash.template');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -44,11 +48,15 @@ var DEFAULT_OPTIONS = {
   },
   output: '',
   fileIgnorePatterns: [],
-  fileGlobsPatterns: [],
+  filePatterns: [],
   templates: {
     'manifest.json': _path2.default.join(__dirname, './tmpl/manifest.json'),
     'assets.json': _path2.default.join(__dirname, './tmpl/assets.json')
-  }
+  },
+  urlPatterns: [{
+    test: '^https?:\\/\\/cdnjs\\.cloudflare\\.com',
+    handler: 'cacheFirst'
+  }]
 };
 
 var Precache = function () {
@@ -118,8 +126,11 @@ var Precache = function () {
       var publicPath = compiler.options.output.publicPath;
       var _options = this.options,
           fileIgnorePatterns = _options.fileIgnorePatterns,
-          fileGlobsPatterns = _options.fileGlobsPatterns;
+          filePatterns = _options.filePatterns;
 
+      var matchPattern = function matchPattern(p, url) {
+        return p.length ? (0, _minimatch2.default)(url, p) : p.test(url);
+      };
 
       return Object.keys(compilation.assets).map(function (f) {
         return _path2.default.join(outputPath, f);
@@ -128,8 +139,8 @@ var Precache = function () {
           return p.test(url);
         });
       }).filter(function (url) {
-        return fileGlobsPatterns.every(function (p) {
-          return p.test(url);
+        return filePatterns.every(function (p) {
+          return matchPattern(p, url);
         });
       }).map(function (f) {
         return publicPath + f.replace(outputPath + _path2.default.sep, '');
