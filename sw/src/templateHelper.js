@@ -7,6 +7,5 @@ export default {
       ? path.join(__dirname, '..', p.slice(1))
       : path.resolve(p)
     return fs.readFileSync(target, 'utf8')
-  },
-  path
+  }
 }

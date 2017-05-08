@@ -11,7 +11,11 @@ const DEFAULT_OPTIONS = {
     cacheName: '',
     scope: '/',
     downgrade: false,
-    assets: null
+    assets: null,
+    urlPatterns: [{
+      test: /^https?:\/\/cdnjs\.cloudfaure\.cn/,
+      handler: 'cacheFirst'
+    }]
   },
   output: '',
   fileIgnorePatterns: [],
@@ -19,11 +23,7 @@ const DEFAULT_OPTIONS = {
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
     'assets.json': path.join(__dirname, './tmpl/assets.json')
-  },
-  urlPatterns: [{
-    test: '^https?:\\/\\/cdnjs\\.cloudflare\\.com',
-    handler: 'cacheFirst'
-  }]
+  }
 }
 
 export default class Precache {
@@ -37,8 +37,12 @@ export default class Precache {
     const { sw = {}, ...options } = this.__opts
     this.options = { ...omit(DEFAULT_OPTIONS, 'sw'), ...options }
 
+    const regexp2str = reg => reg.source.replace(/\\/g, '\\\\')
     const assets = sw.assets || this.getAssets(compiler, compilation)
-    this.sw = { ...DEFAULT_OPTIONS.sw, ...sw, assets }
+    const urlPatterns = [].concat(DEFAULT_OPTIONS.sw.urlPatterns)
+      .map(item => ({ ...item, test: regexp2str(item.test) }))
+
+    this.sw = { ...DEFAULT_OPTIONS.sw, ...sw, assets, urlPatterns }
   }
 
   apply(compiler) {

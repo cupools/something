@@ -44,7 +44,11 @@ var DEFAULT_OPTIONS = {
     cacheName: '',
     scope: '/',
     downgrade: false,
-    assets: null
+    assets: null,
+    urlPatterns: [{
+      test: /^https?:\/\/cdnjs\.cloudfaure\.cn/,
+      handler: 'cacheFirst'
+    }]
   },
   output: '',
   fileIgnorePatterns: [],
@@ -52,11 +56,7 @@ var DEFAULT_OPTIONS = {
   templates: {
     'manifest.json': _path2.default.join(__dirname, './tmpl/manifest.json'),
     'assets.json': _path2.default.join(__dirname, './tmpl/assets.json')
-  },
-  urlPatterns: [{
-    test: '^https?:\\/\\/cdnjs\\.cloudflare\\.com',
-    handler: 'cacheFirst'
-  }]
+  }
 };
 
 var Precache = function () {
@@ -78,8 +78,15 @@ var Precache = function () {
 
       this.options = _extends({}, (0, _lodash4.default)(DEFAULT_OPTIONS, 'sw'), options);
 
+      var regexp2str = function regexp2str(reg) {
+        return reg.source.replace(/\\/g, '\\\\');
+      };
       var assets = sw.assets || this.getAssets(compiler, compilation);
-      this.sw = _extends({}, DEFAULT_OPTIONS.sw, sw, { assets: assets });
+      var urlPatterns = [].concat(DEFAULT_OPTIONS.sw.urlPatterns).map(function (item) {
+        return _extends({}, item, { test: regexp2str(item.test) });
+      });
+
+      this.sw = _extends({}, DEFAULT_OPTIONS.sw, sw, { assets: assets, urlPatterns: urlPatterns });
     }
   }, {
     key: 'apply',
