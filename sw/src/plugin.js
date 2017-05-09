@@ -22,7 +22,8 @@ const DEFAULT_OPTIONS = {
   filePatterns: [],
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
-    'assets.json': path.join(__dirname, './tmpl/assets.json')
+    'assets.json': path.join(__dirname, './tmpl/assets.json'),
+    'sw.js': path.join(__dirname, './tmpl/sw.js')
   }
 }
 
