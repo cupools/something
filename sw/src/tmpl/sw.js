@@ -1,5 +1,5 @@
-const CONFIG = JSON.parse('<%= JSON.stringify(options).replace(/\\\\\\\\/g, "\\\\") %>')
-const LIST = JSON.parse('<%= JSON.stringify(assets) %>')
+const CONFIG = JSON.parse('<%= stringify(options) %>')
+const LIST = JSON.parse('<%= stringify(assets) %>')
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -22,7 +22,7 @@ self.addEventListener('fetch', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keyList => Promise.all(
-      keyList.map(key => (CONFIG.assets.includes(key) ? caches.delete(key) : Promise.resolve()))
+      keyList.map(key => (LIST.includes(key) ? caches.delete(key) : Promise.resolve()))
     )
   ))
 })

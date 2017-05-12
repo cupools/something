@@ -2,7 +2,7 @@
   "name": "sw",
   "version": "0.0.1",
   "description": "service worker example",
-  "main": "index.js",
+  "main": "lib/plugin.js",
   "scripts": {
     "start": "cross-env NODE_ENV=develop node build/server.js",
     "babel": "rm -rf lib && node node_modules/babel-cli/bin/babel src -d lib -D -w",

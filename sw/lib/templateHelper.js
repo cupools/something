@@ -18,5 +18,8 @@ exports.default = {
   include: function include(p) {
     var target = p.indexOf('$') === 0 ? _path2.default.join(__dirname, '..', p.slice(1)) : _path2.default.resolve(p);
     return _fs2.default.readFileSync(target, 'utf8');
+  },
+  stringify: function stringify(obj) {
+    return JSON.stringify(obj).replace(/\\/g, '\\\\');
   }
 };

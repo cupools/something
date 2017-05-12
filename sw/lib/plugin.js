@@ -79,12 +79,9 @@ var Precache = function () {
 
       this.options = _extends({}, (0, _lodash4.default)(DEFAULT_OPTIONS, 'sw'), options);
 
-      var regexp2str = function regexp2str(reg) {
-        return reg.source.replace(/\\/g, '\\\\');
-      };
       var assets = sw.assets || this.getAssets(compiler, compilation);
       var urlPatterns = [].concat(DEFAULT_OPTIONS.sw.urlPatterns).map(function (item) {
-        return _extends({}, item, { test: regexp2str(item.test) });
+        return _extends({}, item, { test: item.test.source });
       });
 
       this.sw = _extends({}, DEFAULT_OPTIONS.sw, sw, { assets: assets, urlPatterns: urlPatterns });

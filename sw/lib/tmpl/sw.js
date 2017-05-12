@@ -1,7 +1,7 @@
 'use strict';
 
-var CONFIG = JSON.parse('<%= JSON.stringify(options).replace(/\\\\\\\\/g, "\\\\") %>');
-var LIST = JSON.parse('<%= JSON.stringify(assets) %>');
+var CONFIG = JSON.parse('<%= stringify(options) %>');
+var LIST = JSON.parse('<%= stringify(assets) %>');
 
 self.addEventListener('install', function (event) {
   event.waitUntil(caches.open(CONFIG.cacheName).then(function (cache) {
@@ -22,7 +22,7 @@ self.addEventListener('fetch', function (event) {
 self.addEventListener('activate', function (event) {
   event.waitUntil(caches.keys().then(function (keyList) {
     return Promise.all(keyList.map(function (key) {
-      return CONFIG.assets.includes(key) ? caches.delete(key) : Promise.resolve();
+      return LIST.includes(key) ? caches.delete(key) : Promise.resolve();
     }));
   }));
 });

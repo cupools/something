@@ -38,10 +38,9 @@ export default class Precache {
     const { sw = {}, ...options } = this.__opts
     this.options = { ...omit(DEFAULT_OPTIONS, 'sw'), ...options }
 
-    const regexp2str = reg => reg.source.replace(/\\/g, '\\\\')
     const assets = sw.assets || this.getAssets(compiler, compilation)
     const urlPatterns = [].concat(DEFAULT_OPTIONS.sw.urlPatterns)
-      .map(item => ({ ...item, test: regexp2str(item.test) }))
+      .map(item => ({ ...item, test: item.test.source }))
 
     this.sw = { ...DEFAULT_OPTIONS.sw, ...sw, assets, urlPatterns }
   }
