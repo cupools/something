@@ -20,10 +20,11 @@ const DEFAULT_OPTIONS = {
   output: '',
   fileIgnorePatterns: [],
   filePatterns: [],
+  fileFreshPatterns: [],
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
     'assets.json': path.join(__dirname, './tmpl/assets.json'),
-    'sw.js': path.join(__dirname, './tmpl/sw.js')
+    'sw.js': path.join(__dirname, '../dist/sw.js')
   }
 }
 
@@ -76,16 +77,21 @@ export default class Precache {
   }
 
   getAssets(compiler, compilation) {
-    const { outputPath } = compiler
+    // const { outputPath } = compiler
     const { publicPath } = compiler.options.output
-    const { fileIgnorePatterns, filePatterns } = this.options
-    const matchPattern = (p, url) => (p.length ? minimatch(url, p) : p.test(url))
+    const { filePatterns, fileIgnorePatterns, fileFreshPatterns } = this.options
+    const matchPattern = (url, p) => (p.length ? minimatch(url, p) : p.test(url))
 
     return Object.keys(compilation.assets)
-      .map(f => path.join(outputPath, f))
+      // .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
-      .filter(url => filePatterns.every(p => matchPattern(p, url)))
-      .map(f => publicPath + f.replace(outputPath + path.sep, ''))
+      .filter(url => filePatterns.some(matchPattern.bind(null, url)))
+      .map(p => {
+        const baseURL = publicPath + p
+        const fresh = fileFreshPatterns.some(matchPattern.bind(null, p))
+
+        return baseURL + (fresh ? '?hash' : '') // TODO
+      })
   }
 
   render() {
