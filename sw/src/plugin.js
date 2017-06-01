@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import crypto from 'crypto'
 import minimatch from 'minimatch'
 import template from 'lodash.template'
 import omit from 'lodash.omit'
@@ -21,6 +22,7 @@ const DEFAULT_OPTIONS = {
   fileIgnorePatterns: [],
   filePatterns: [],
   fileFreshPatterns: [],
+  replacePublicPath: () => false,
   templates: {
     'manifest.json': path.join(__dirname, './tmpl/manifest.json'),
     'assets.json': path.join(__dirname, './tmpl/assets.json'),
@@ -77,20 +79,22 @@ export default class Precache {
   }
 
   getAssets(compiler, compilation) {
-    // const { outputPath } = compiler
+    const { replacePublicPath } = this.options
     const { publicPath } = compiler.options.output
     const { filePatterns, fileIgnorePatterns, fileFreshPatterns } = this.options
     const matchPattern = (url, p) => (p.length ? minimatch(url, p) : p.test(url))
 
     return Object.keys(compilation.assets)
-      // .map(f => path.join(outputPath, f))
       .filter(url => !fileIgnorePatterns.some(p => p.test(url)))
       .filter(url => filePatterns.some(matchPattern.bind(null, url)))
       .map(p => {
-        const baseURL = publicPath + p
+        const baseURL = (replacePublicPath(p) || publicPath) + p
         const fresh = fileFreshPatterns.some(matchPattern.bind(null, p))
 
-        return baseURL + (fresh ? '?hash' : '') // TODO
+        if (!fresh) return baseURL
+
+        const hash = crypto.createHash('md5').update(compilation.assets[p].source()).digest('hex').substr(0, 6)
+        return `${baseURL}?_h=${hash}`
       })
   }
 

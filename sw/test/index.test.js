@@ -17,7 +17,7 @@ describe('plugin', () => {
       output: {
         path: path.join(__dirname, 'tmp'),
         filename: '[name].[chunkhash:6].js',
-        publicPath: '/'
+        publicPath: 'http://cdn.cn/assets/'
       },
       plugins: [
         new HtmlWebpackPlugin({
@@ -32,8 +32,13 @@ describe('plugin', () => {
             assets: null
           },
           output: path.join(__dirname, './tmp/sw/'),
-          fileIgnorePatterns: [/html/],
-          filePatterns: ['**/*.@(html|css)']
+          fileIgnorePatterns: [],
+          fileFreshPatterns: [/\.html$/],
+          filePatterns: ['**/*.@(html|css|png)'],
+          replacePublicPath: p => {
+            if (/\.html$/.test(p)) return 'http://domain.cn/views/'
+            return false
+          }
         })
       ]
     })
