@@ -10,3 +10,4 @@ coverage
 /sw/dist
 /sw/curl.sh
 /sw/test/tmp
+/xlsx4conf/.nyc_output

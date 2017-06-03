@@ -2,7 +2,7 @@ const XLSX = require('xlsx')
 
 function xlsx2json(raw) {
   const workbook = XLSX.read(raw)
-  return workbook.SheetNames.map(parse)
+  return workbook.SheetNames.map(sheetName => parse(workbook.Sheets[sheetName]))
 }
 
 function parse(sheet) {
