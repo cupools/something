@@ -8,6 +8,7 @@ Chai.should()
 describe('index', () => {
   it('should work', () => {
     const buffer = fs.readFileSync('test/fixtures/raw.xlsx')
-    xlsx4conf(buffer)
+    const list = xlsx4conf(buffer)
+    console.log(list)
   })
 })
