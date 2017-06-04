@@ -1,4 +1,5 @@
 const XLSX = require('xlsx')
+const cheerio = require('cheerio')
 
 function xlsx2json(raw) {
   const workbook = XLSX.read(raw)
@@ -6,8 +7,11 @@ function xlsx2json(raw) {
 }
 
 function parse(sheet) {
-  const json = XLSX.utils.sheet_to_json(sheet)
-  return json.reduce()
+  const html = XLSX.utils.sheet_to_html(sheet)
+}
+
+function flagmap(html) {
+  const $ = cheerio.load(html)
 }
 
 module.exports = xlsx2json
