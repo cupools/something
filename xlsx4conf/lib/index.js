@@ -15,30 +15,39 @@ var _extends5 = _interopRequireDefault(_extends4);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var XLSX = require('xlsx');
+var SEP = '__SEP__';
 
-function xlsx2json(raw) {
+function xlsx2json(raw, name) {
   var workbook = XLSX.read(raw);
-  return workbook.SheetNames.reduce(function (mem, sheetName) {
+  return workbook.SheetNames.filter(function (sheetName) {
+    return sheetName ? name === sheetName : true;
+  }).reduce(function (mem, sheetName) {
     return (0, _extends5.default)({}, mem, (0, _defineProperty3.default)({}, sheetName, parse(workbook.Sheets[sheetName])));
   }, {});
 }
 
 function parse(sheet) {
   var mergesInfo = sheet['!merges'];
-  var csv = XLSX.utils.sheet_to_csv(sheet);
+  var csv = XLSX.utils.sheet_to_csv(sheet, { FS: SEP });
   var table = csv.split('\n').slice(0, -1).map(function (rowstr) {
-    return rowstr.split(',');
+    return rowstr.split(SEP);
   });
 
   var correct = correctMerges(mergesInfo);
   var get = function get(col, row) {
     if (table[row][col] !== '') return table[row][col];
 
-    var _correct = correct(col, row),
-        c = _correct.c,
-        r = _correct.r;
+    // try to resolve merged cell
+    var possible = correct(col, row);
 
-    return table[r][c] != null ? table[r][c] : null;
+    if (possible) {
+      var c = possible.c,
+          r = possible.r;
+
+      return table[r][c];
+    }
+
+    return undefined;
   };
 
   var header = table.slice(0, 1).shift();
@@ -47,7 +56,7 @@ function parse(sheet) {
     if (rowIndex === 0) return null;
     return row.reduce(function (mem, val, colIndex) {
       var value = get(colIndex, rowIndex);
-      return (0, _extends5.default)({}, mem, (0, _defineProperty3.default)({}, header[colIndex], value));
+      return (0, _extends5.default)({}, mem, (0, _defineProperty3.default)({}, header[colIndex], value ? value.trim() : value));
     }, {});
   }).slice(1);
 }

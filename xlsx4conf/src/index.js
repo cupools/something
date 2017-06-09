@@ -1,24 +1,34 @@
 const XLSX = require('xlsx')
+const SEP = '__SEP__'
 
-function xlsx2json(raw) {
+function xlsx2json(raw, name) {
   const workbook = XLSX.read(raw)
-  return workbook.SheetNames.reduce(
-    (mem, sheetName) => ({ ...mem, [sheetName]: parse(workbook.Sheets[sheetName]) }),
-    {}
-  )
+  return workbook.SheetNames
+    .filter(sheetName => (sheetName ? name === sheetName : true))
+    .reduce(
+      (mem, sheetName) => ({ ...mem, [sheetName]: parse(workbook.Sheets[sheetName]) }),
+      {}
+    )
 }
 
 function parse(sheet) {
   const mergesInfo = sheet['!merges']
-  const csv = XLSX.utils.sheet_to_csv(sheet)
-  const table = csv.split('\n').slice(0, -1).map(rowstr => rowstr.split(','))
+  const csv = XLSX.utils.sheet_to_csv(sheet, { FS: SEP })
+  const table = csv.split('\n').slice(0, -1).map(rowstr => rowstr.split(SEP))
 
   const correct = correctMerges(mergesInfo)
   const get = (col, row) => {
     if (table[row][col] !== '') return table[row][col]
-    const { c, r } = correct(col, row)
 
-    return table[r][c] != null ? table[r][c] : null
+    // try to resolve merged cell
+    const possible = correct(col, row)
+
+    if (possible) {
+      const { c, r } = possible
+      return table[r][c]
+    }
+
+    return undefined
   }
 
   const header = table.slice(0, 1).shift()
@@ -28,7 +38,7 @@ function parse(sheet) {
       if (rowIndex === 0) return null
       return row.reduce((mem, val, colIndex) => {
         const value = get(colIndex, rowIndex)
-        return { ...mem, [header[colIndex]]: value }
+        return { ...mem, [header[colIndex]]: value ? value.trim() : value }
       }, {})
     })
     .slice(1)
